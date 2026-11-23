@@ -155,5 +155,30 @@ export const updateRestaurantStatus = TryCatch(async (req: AuthenticateRequest, 
     })
 })
 
+export const updateRestaurant = TryCatch(async (req: AuthenticateRequest, res)=>{
+    const user = req.user;
+    if(!req.user){
+        res.status(401).json({
+            message: 'Unauthorized User, please login.'
+        })
+    }
+
+     const {name, description} = req.body;
+
+    const restaurant = await Restaurant.findOneAndUpdate({ownerId: user?._id as string},{name, description},{new: true});
+
+    if(!restaurant){
+        res.status(404).json({
+            message: 'No restaurant found.'
+        });
+        return;
+    }
+
+    res.status(201).json({
+        message: 'Restaurant status updated.',
+        restaurant
+    })
+})
+
 // Your Registered User ID: 842794714742
 // Your Password:8427947147

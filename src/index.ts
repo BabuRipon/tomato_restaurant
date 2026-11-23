@@ -5,6 +5,7 @@ dotenv.config();
 
 import { connectToDb } from './config/db.js';
 import restaurantRoutes from './routes/restaurant.js';
+import menuItemRoutes from './routes/menuItems.js';
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/restaurant', restaurantRoutes);
+app.use('/api/menuItem', menuItemRoutes);
 
 const port = process.env.PORT || 5001;
 app.listen(port, async () => {

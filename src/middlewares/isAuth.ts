@@ -27,7 +27,7 @@ export const isAuth = async (req: AuthenticateRequest, res: Response, next: Next
         }
 
         const token = authHeader.split(' ')[1];
-        if(!token){
+        if(!token || token==='null'){
             res.status(401).json({
                 message: 'please login - token missing.'
             })
@@ -45,9 +45,10 @@ export const isAuth = async (req: AuthenticateRequest, res: Response, next: Next
         req.user = decodedValue.user;
         next();
     }
-    catch(error){
+    catch(error: any){
         res.status(500).json({
-            message: 'please login - jwt error'
+            message: 'please login - jwt error',
+            error: error?.response?.message?.data
         })
     }
 }
