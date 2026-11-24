@@ -180,5 +180,63 @@ export const updateRestaurant = TryCatch(async (req: AuthenticateRequest, res)=>
     })
 })
 
-// Your Registered User ID: 842794714742
-// Your Password:8427947147
+export const getNearbyRestaurant = TryCatch(async (req: AuthenticateRequest, res) => {
+    const {lat, long, search} = req.query as {
+        lat?: string;
+        long?:string;
+        search?:string
+    };
+
+    if(!lat || !long){
+        res.status(400).json({
+            message: 'latitude and longitude are required'
+        })
+        return;
+    }
+    
+    const query: any = {
+        isVerified: false
+    }
+
+    if(search && typeof search === 'string'){
+        query.name = {$regex: search, $options: 'i'}
+    }
+
+    const restaurants = await Restaurant.aggregate([
+        {
+            $geoNear:{
+                near:{
+                    type: 'Point',
+                    coordinates: [parseFloat(long), parseFloat(lat)]
+                },
+                distanceField: 'distance',
+                maxDistance: 20000,
+                spherical: true,
+                query
+            }
+        },
+        {
+            $sort: {isOpen: -1, distance: 1}
+        },
+        {
+            $addFields: {
+                distanceKm: {
+                    $round: [{$divide: ["$distance", 1000]}, 2]
+                }
+            },
+        }
+    ]);
+
+    res.status(200).json({
+        success: true,
+        count: restaurants.length,
+        restaurants
+    })
+})
+
+export const fetchSingleRestaurant = TryCatch(async (req: AuthenticateRequest, res) => {
+    const {id} = req.params;
+    const restaurant = await Restaurant.findById(id);
+
+    res.status(200).json(restaurant);
+})
