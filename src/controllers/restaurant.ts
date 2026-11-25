@@ -210,7 +210,7 @@ export const getNearbyRestaurant = TryCatch(async (req: AuthenticateRequest, res
                     coordinates: [parseFloat(long), parseFloat(lat)]
                 },
                 distanceField: 'distance',
-                maxDistance: 20000,
+                maxDistance: 200000,
                 spherical: true,
                 query
             }
